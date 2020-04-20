@@ -1,0 +1,12 @@
+Parameters;Values
+ICU_percentage;22,00%
+Ventilation_percentage;16,00%
+cases_hospital_percentage;49,00%
+Total_population;11400000
+ICU_capacity;2200
+ventilator_capacity;2000
+Avg_delay_infection;12 
+Avg_contagious_period;4 
+Contagious from how many days after infection?;0 
+avg_stay_ICU;18
+avg_stay_ventilator;20
