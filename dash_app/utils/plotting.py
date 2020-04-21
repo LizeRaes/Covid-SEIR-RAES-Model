@@ -1,7 +1,9 @@
+"""This module contains helper functions for making visualisations
+"""
 from typing import Dict, Any
 import pandas as pd
 
-def plot_dataframe(dataframe: pd.DataFrame,max_y_axis: int = None,) -> Dict[str, Any]:
+def plot_dataframe(dataframe: pd.DataFrame,max_y_axis: int = None) -> Dict[str, Any]:
     """Returns dictionary used for plotly graphs
     Arguments:
         dataframe: The dataframe to plot. Plots all columns as y, index is x.
