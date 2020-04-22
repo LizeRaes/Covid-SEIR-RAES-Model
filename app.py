@@ -4,6 +4,7 @@ import os
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import pandas as pd
 
@@ -30,8 +31,10 @@ def build_banner():
             html.Div(
                 id="banner-text",
                 children=[
-                    html.H5("Covid-19 Dashboard"),
-                    html.H6("Projection Reporting"),
+                    dbc.Row([
+                        dbc.Col(html.Img(id="logo", src=app.get_asset_url("virus_white.svg")), width = 1),
+                        dbc.Col(html.H5("Covid-19 Dashboard"))
+                    ])
                 ],
             )
         ],
@@ -39,41 +42,41 @@ def build_banner():
 
 
 # Build tabs
-def build_tabs_not_used():
-    return html.Div(
-        id="tabs",
-        className="tabs",
-        children=[
-            dcc.Tabs(
-                id="app-tabs",
-                value="tab-1",
-                className="custom-tabs",
-                children=[
-                    dcc.Tab(
-                        id="Parameter-tab",
-                        label="Parameters Used",
-                        value="tab1",
-                        className="custom-tab",
-                        selected_className="custom-tab--selected",
-                    ),
-                    dcc.Tab(
-                        id="Current-tab",
-                        label="Current situation",
-                        value="tab-2",
-                        className="custom-tab",
-                        selected_className="custom-tab--selected",
-                    ),
-                    dcc.Tab(
-                        id="Projection-tab",
-                        label="Projection",
-                        value="tab-3",
-                        className="custom-tab",
-                        selected_className="custom-tab--selected",
-                    )
-                ],
-            )
-        ],
-    )
+# def build_tabs_not_used():
+#     return html.Div(
+#         id="tabs",
+#         className="tabs",
+#         children=[
+#             dcc.Tabs(
+#                 id="app-tabs",
+#                 value="tab-1",
+#                 className="custom-tabs",
+#                 children={
+#                     dcc.Tab(
+#                         id="Parameter-tab",
+#                         label="Parameters Used",
+#                         value="tab-1",
+#                         className="custom-tab",
+#                         selected_className="custom-tab--selected",
+#                     ),
+#                     dcc.Tab(
+#                         id="Current-tab",
+#                         label="Current situation",
+#                         value="tab-2",
+#                         className="custom-tab",
+#                         selected_className="custom-tab--selected",
+#                     ),
+#                     dcc.Tab(
+#                         id="Projection-tab",
+#                         label="Projection",
+#                         value="tab-3",
+#                         className="custom-tab",
+#                         selected_className="custom-tab--selected",
+#                     )
+#                 },
+#             )
+#         ],
+#     )
 
 
 # Create HTML structure

@@ -1,0 +1,50 @@
+/* banner visuals */
+.banner{
+	background-color: #1372B3
+}
+
+/* virus icon */
+.banner Img {
+    height: 36px;
+	margin-left: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* app title*/
+.banner h5{
+	font-family: Roboto;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 18px;
+	line-height: 21px;
+	text-align: left;
+
+	color: #FFFFFF;
+
+    margin-left: -40px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+
+}
+
+/* tabs visuals */
+.tab.jsx-2137964197{
+	background-color: #1372B3;
+    color: #fff;
+	border: 1px solid #1372B3;
+	font-family: Roboto;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 18px;
+	line-height: 21px;
+	text-align: center;
+}
+
+.tab.jsx-2137964197:hover{
+	background-color: #0f598a;
+}
+
+.tab--selected.jsx-2137964197{
+	background-color: #0f598a;
+}
