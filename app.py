@@ -13,17 +13,20 @@ from dash_app.tabs import current
 from dash_app.tabs import parameters
 from dash_app.tabs import projection
 from dash_app.utils.plotting import plot_dataframe
+from dash_app.tabs.current import pv_hosp
+from dash_app.tabs.current import df_sex
+from dash_app.tabs.current import pv_mort
 
 from raes_seir.model.parameters import Parameters
 from raes_seir.model.measures import Measures
 from raes_seir.model.model import Model
 
-
-
-
 TEST_PARAM = Parameters()
 
+
 def build_banner():
+    """Generate the banner
+    """
     return html.Div(
         id="banner",
         className="banner",
@@ -32,7 +35,8 @@ def build_banner():
                 id="banner-text",
                 children=[
                     dbc.Row([
-                        dbc.Col(html.Img(id="logo", src=app.get_asset_url("virus_white.svg")), width = 1),
+                        dbc.Col(html.Img(id="logo", src=APP.get_asset_url(
+                            "virus_white.svg")), width=1),
                         dbc.Col(html.H5("Covid-19 Dashboard"))
                     ])
                 ],
@@ -40,64 +44,26 @@ def build_banner():
         ],
     )
 
-
-# Build tabs
-# def build_tabs_not_used():
-#     return html.Div(
-#         id="tabs",
-#         className="tabs",
-#         children=[
-#             dcc.Tabs(
-#                 id="app-tabs",
-#                 value="tab-1",
-#                 className="custom-tabs",
-#                 children={
-#                     dcc.Tab(
-#                         id="Parameter-tab",
-#                         label="Parameters Used",
-#                         value="tab-1",
-#                         className="custom-tab",
-#                         selected_className="custom-tab--selected",
-#                     ),
-#                     dcc.Tab(
-#                         id="Current-tab",
-#                         label="Current situation",
-#                         value="tab-2",
-#                         className="custom-tab",
-#                         selected_className="custom-tab--selected",
-#                     ),
-#                     dcc.Tab(
-#                         id="Projection-tab",
-#                         label="Projection",
-#                         value="tab-3",
-#                         className="custom-tab",
-#                         selected_className="custom-tab--selected",
-#                     )
-#                 },
-#             )
-#         ],
-#     )
-
-
 # Create HTML structure
+
 
 # Import stylesheets
 EXTERNAL_STYLESHEETS = [
     'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css']
 
-app = dash.Dash(
+APP = dash.Dash(
     __name__,
     meta_tags=[{"name": "viewport",
                 "content": "width=device-width, initial-scale=1"}],
     external_stylesheets=EXTERNAL_STYLESHEETS,
     assets_folder='dash_app/assets'
 )
-app.title = 'Covid-19 Dashboard'
-server = app.server
+APP.title = 'Covid-19 Dashboard'
+SERVER = APP.server
 
-app.config['suppress_callback_exceptions'] = True
+APP.config['suppress_callback_exceptions'] = True
 
-app.layout = html.Div(
+APP.layout = html.Div(
     id="big-app-container",
     children=[
         build_banner(),
@@ -130,9 +96,17 @@ app.layout = html.Div(
 
 
 # CALLBACKS
-@app.callback(Output('tabs-content', 'children'),
+@APP.callback(Output('tabs-content', 'children'),
               [Input('tabs', 'value')])
 def render_content(tab):
+    """This function wil return the specified tab
+
+    Args:
+        tab (str): tab name
+
+    Returns:
+        layout tab
+    """
     if tab == 'tab-1':
         return parameters.tab_1_layout
     elif tab == 'tab-2':
@@ -140,7 +114,8 @@ def render_content(tab):
     elif tab == 'tab-3':
         return projection.tab_3_layout
 
-@app.callback(
+
+@APP.callback(
     Output('measure_input', 'data'),
     [Input('editing-rows-button', 'n_clicks')],
     [State('measure_input', 'data'),
@@ -160,12 +135,15 @@ def add_row(n_clicks, rows, columns):
     return rows
 
 
-@app.callback(
+@APP.callback(
     Output(component_id='projection-chart', component_property='figure'),
-    [Input(component_id='measure_input', component_property='data'),
-     Input(component_id='measure_input', component_property='columns')]
+    [
+        Input('facts', 'value'),
+        Input(component_id='measure_input', component_property='data'),
+        Input(component_id='measure_input', component_property='columns')
+    ]
 )
-def plot_projection(rows, columns):
+def plot_projection(facts, rows, columns):
     """this function makes a visualisation with the applied measures.
     Args:
         rows: data in the datatable
@@ -180,8 +158,35 @@ def plot_projection(rows, columns):
         input_measures['Date'], input_measures['R0'])
     test_output = Model.generate_projection({}, TEST_PARAM, test_measure)
     temp = plot_dataframe(test_output)
-    return temp
+    pv_sex = df_sex.groupby(['DATE'], as_index=False).sum()
+    fig = go.Figure()
+    # Add traces
+    for element in temp['data']:
+        if element["name"] in ['confirmed_today', 'hospital_today',
+                               'ICU_today', 'confirmed_today', 'deaths_today']:
+            element["name"] = 'Predicted_' + element["name"]
+            element["line"] = dict(width=4, dash='dot')
+            fig.add_trace(element)
+    fig.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN"],
+                             mode='lines',
+                             name='Actual_hospitalized')
+                  )
+    fig.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_sex["CASES"],
+                             mode='lines',
+                             name='Actual_confirmed')
+                  )
+    fig.add_trace(go.Scatter(x=pv_mort["DATE"], y=pv_mort["DEATHS"],
+                             mode='lines',
+                             name='Actual_deaths',
+                             ))
+    updated_fig = go.Figure()
+    for fact in facts:
+        for element in fig['data']:
+            if fact in element['name']:
+                updated_fig.add_trace(element)
+    updated_fig.update_layout(temp['layout'])
+    return updated_fig
 
 
 if __name__ == '__main__':
-    app.run_server(port=int(os.environ.get('PORT', 8080)), debug=True)
+    APP.run_server(port=int(os.environ.get('PORT', 8080)), debug=True)

@@ -11,11 +11,24 @@ params = [
 example_measures = pd.read_excel(
     "dash_app/data/param_test.xlsx", sheet_name='R0')
 
+facts = dcc.Dropdown(
+    id='facts',
+    options=[
+        {'label': 'Confirmed', 'value': 'confirmed'},
+        {'label': 'Hospitalized', 'value': 'hospital'},
+        {'label': 'Intensive Care', 'value': 'ICU'},
+        {'label': 'Deaths', 'value': 'death'}
+    ],
+    value=['hospital'],
+    multi=True
+)
+
 
 tab_3_layout = html.Div([
     # Left filter pane
     html.Div(
         [
+            facts,
             dash_table.DataTable(
                 id='measure_input',
                 columns=(
@@ -26,7 +39,7 @@ tab_3_layout = html.Div([
                 row_deletable=True,
                 style_cell={
                     'height': 'auto',
-                    'minWidth': '0px', 'maxWidth': '20px',
+                    'minWidth': '0px', 'maxWidth': '2px',
                     'whiteSpace': 'normal'
                 },
                 style_data_conditional=[
