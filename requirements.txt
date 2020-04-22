@@ -1,0 +1,6 @@
+dash==1.8.0
+numpy==1.18.1
+requests==2.23.0
+pandas==0.25.3
+xlrd==1.2.0
+gcsfs==0.6.0
