@@ -24,7 +24,7 @@ facts = dcc.Dropdown(
 )
 
 
-tab_3_layout = html.Div([
+tab_layout = html.Div([
     # Left filter pane
     html.Div(
         [

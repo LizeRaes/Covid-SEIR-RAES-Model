@@ -108,11 +108,11 @@ def render_content(tab):
         layout tab
     """
     if tab == 'tab-1':
-        return current.tab_2_layout
+        return current.tab_layout
     elif tab == 'tab-2':
-        return parameters.tab_1_layout
+        return parameters.tab_layout
     elif tab == 'tab-3':
-        return projection.tab_3_layout
+        return projection.tab_layout
 
 
 @APP.callback(

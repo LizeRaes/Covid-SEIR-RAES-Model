@@ -185,7 +185,7 @@ fig_pie.update_layout(
 )
 
 # Build the Layout of the dashboard
-tab_2_layout = html.Div(
+tab_layout = html.Div(
     [
         dbc.Row([
             dbc.Col(
