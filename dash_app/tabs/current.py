@@ -1,13 +1,13 @@
 import plotly.graph_objects as go
-#import dash
+# import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-#from dash.dependencies import Input, Output
-#from app import *
+# from dash.dependencies import Input, Output
+# from app import *
 import numpy as np
 import plotly.express as px
-#from urllib.request import urlopen
+# from urllib.request import urlopen
 import json
 import pandas as pd
 
@@ -23,14 +23,15 @@ title_font = dict(
 # Load CSV files from https://epistat.sciensano.be
 df_sex = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.csv', sep=',', encoding='latin-1')
 # df_muni = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_CASES_MUNI.csv', sep=',', encoding='latin-1')
-df_muni_cum = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_CASES_MUNI_CUM.csv', sep=',', encoding='latin-1')
+df_muni_cum = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_CASES_MUNI_CUM.csv', sep=',', encoding='latin-1',
+                          dtype={"NIS5": str})
 df_hosp = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_HOSP.csv', sep=',', encoding='latin-1')
 df_mort = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_MORT.csv', sep=',', encoding='latin-1')
 df_tests = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_tests.csv', sep=',', encoding='latin-1')
 
 # replacing na values in df_sex
 df_sex["SEX"].fillna("Unknown", inplace=True)
-df_sex['SEX'] = df_sex['SEX'].map({"F":"Female", "M":"Male"})
+df_sex['SEX'] = df_sex['SEX'].map({"F": "Female", "M": "Male", "Unknown": "Unknown"})
 
 # PIVOTS
 pv_sex = pd.pivot_table(df_sex, values='CASES', columns=['SEX'], aggfunc=np.sum)
@@ -42,14 +43,19 @@ pv_mort_age = df_mort.groupby(['AGEGROUP'], as_index=False).sum()
 # Replace all less than 5s with 3 and convert data to numeric
 df_muni_cum.replace('<5', 3, inplace=True)
 df_muni_cum["CASES"] = pd.to_numeric(df_muni_cum["CASES"])
+# df_muni_cum["Regions"] = np.where(df_muni_cum["TX_DESCR_NL"] == df_muni_cum["TX_DESCR_FR"],
+#                                   df_muni_cum["TX_DESCR_NL"],
+#                                   df_muni_cum["TX_DESCR_NL"] + '#' + df_muni_cum["TX_DESCR_FR"])
+df_muni_cum['ID'] = df_muni_cum['TX_RGN_DESCR_FR'].map({"Région flamande": "BE2", "Région wallonne": "BE3", "Région de Bruxelles-Capitale": "BE4"})
+df_muni_cum["Regions"] = df_muni_cum['ID'] + df_muni_cum['NIS5']
 
 # Read in geojson
 with open("dash_app/assets/municipalities_belgium.geojson") as response:
     municipalities = json.load(response)
 
 # Create a map
-fig_map = px.choropleth_mapbox(df_muni_cum, geojson=municipalities, locations='TX_DESCR_NL', color='CASES',
-                               featureidkey="properties.name",
+fig_map = px.choropleth_mapbox(df_muni_cum, geojson=municipalities, locations='Regions', color='CASES',
+                               featureidkey="properties.shn",
                                mapbox_style="carto-positron",
                                zoom=6, center={"lat": 50.5039, "lon": 4.4699},
                                opacity=0.5,
@@ -61,8 +67,6 @@ fig_map.update_layout(
     title_text="Covid_19 cases (count)",
     font=title_font
 )
-
-
 
 # Create Covid-19 cases (count per day) plot
 fig_hosp = go.Figure()
@@ -90,7 +94,7 @@ fig_hosp.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN_ECMO"],
 # Add title to the plot
 fig_hosp.update_layout(
     title_text="Covid-19 hospitalisation cases (count per day)",
-    #xaxis_title="Date",
+    # xaxis_title="Date",
     yaxis_title="Number of hospitalised people",
     font=title_font
 )
@@ -119,7 +123,7 @@ fig_line_deaths.add_trace(go.Scatter(x=pv_mort["DATE"], y=pv_mort["DEATHS"],
 # Add title to the plot
 fig_line_deaths.update_layout(
     title_text="Covid-19 deaths (count per day)",
-    #xaxis_title="Date",
+    # xaxis_title="Date",
     yaxis_title="Number of deaths",
     font=title_font
 )
@@ -137,7 +141,7 @@ fig_line_deaths.update_layout(
 # Add title to the plot
 fig_line_deaths.update_layout(
     title_text="Covid-19 deaths (count per day)",
-    #xaxis_title="Date",
+    # xaxis_title="Date",
     yaxis_title="Number of tests",
     font=title_font
 )
@@ -149,7 +153,7 @@ fig_bar_tests.update_traces(marker_color=colours_list[5])
 # Add title to the plot
 fig_bar_tests.update_layout(
     title_text="Covid-19 executed tests (count per day)",
-    #xaxis_title="Date",
+    # xaxis_title="Date",
     yaxis_title="Number of tests",
     font=title_font
 )
@@ -177,7 +181,6 @@ fig_pie.update_layout(
     title_text="Covid_19 cases (total count per gender)",
     font=title_font
 )
-
 
 # Build the Layout of the dashboard
 tab_2_layout = html.Div(
