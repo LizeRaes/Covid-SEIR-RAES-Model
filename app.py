@@ -67,20 +67,20 @@ APP.layout = html.Div(
     id="big-app-container",
     children=[
         build_banner(),
-        dcc.Tabs(id="tabs", value='tab-1-example', children=[
+        dcc.Tabs(id="tabs", className='control-tabs', children=[
             dcc.Tab(
-                id="Parameter-tab",
-                label="Parameters",
+                id="Current-tab",
+                label="Current situation",
                 value="tab-1",
                 className="custom-tab",
                 selected_className="custom-tab--selected",
             ),
             dcc.Tab(
-                id="Current-tab",
-                label="Current situation",
+                id="Parameter-tab",
+                label="Parameters",
                 value="tab-2",
                 className="custom-tab",
-                selected_className="custom-tab--selected",
+                selected_className="custom-tab--selected"
             ),
             dcc.Tab(
                 id="Projection-tab",
@@ -108,11 +108,11 @@ def render_content(tab):
         layout tab
     """
     if tab == 'tab-1':
-        return parameters.tab_1_layout
+        return current.tab_layout
     elif tab == 'tab-2':
-        return current.tab_2_layout
+        return parameters.tab_layout
     elif tab == 'tab-3':
-        return projection.tab_3_layout
+        return projection.tab_layout
 
 
 @APP.callback(
