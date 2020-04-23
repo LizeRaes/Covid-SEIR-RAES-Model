@@ -22,6 +22,11 @@ from raes_seir.model.measures import Measures
 from raes_seir.model.model import Model
 
 TEST_PARAM = Parameters()
+MAPPING_LABELS = {
+    "S": "Susceptible",
+    "R": "Recovered",
+    "I": "Infected"
+}
 
 
 def build_banner():
@@ -37,16 +42,17 @@ def build_banner():
                     dbc.Row([
                         dbc.Col(
                             html.Div([
-                                html.Img(id="logo", src=APP.get_asset_url("virus_white.svg"), style={'display': 'inline-block'}),
+                                html.Img(id="logo", src=APP.get_asset_url(
+                                    "virus_white.svg"), style={'display': 'inline-block'}),
                                 html.H5("Covid-19 Dashboard", style={'display': 'inline-block'})])
                         ),
                         dbc.Col(
                             html.A([
-                                html.Img(id="git_img", src=APP.get_asset_url("git.png"))
+                                html.Img(id="git_img",
+                                         src=APP.get_asset_url("git.png"))
                             ], href='https://github.com/LizeRaes/Covid-SEIR-RAES-Model', target="_blank", style={'float': 'right', 'margin-right': '20px'})
                         )
-                    ])
-                    ,
+                    ]),
                 ])
         ]
     )
@@ -83,13 +89,6 @@ APP.layout = html.Div(
                 selected_className="custom-tab--selected",
             ),
             dcc.Tab(
-                id="Parameter-tab",
-                label="Parameters",
-                value="tab-2",
-                className="custom-tab",
-                selected_className="custom-tab--selected"
-            ),
-            dcc.Tab(
                 id="Projection-tab",
                 label="Projection",
                 value="tab-3",
@@ -116,8 +115,8 @@ def render_content(tab):
     """
     if tab == 'tab-1':
         return current.tab_layout
-    elif tab == 'tab-2':
-        return parameters.tab_layout
+    # elif tab == 'tab-2':
+    #     return parameters.tab_layout
     elif tab == 'tab-3':
         return projection.tab_layout
 
@@ -142,22 +141,25 @@ def add_row(n_clicks, rows, columns):
     return rows
 
 
-@APP.callback(
+@APP.callback([
     Output(component_id='projection-chart', component_property='figure'),
-    [
-        Input('facts', 'value'),
-        Input(component_id='measure_input', component_property='data'),
-        Input(component_id='measure_input', component_property='columns')
-    ]
+    Output(component_id='expert-chart', component_property='figure')
+],
+[
+    Input('facts', 'value'),
+    Input(component_id='measure_input', component_property='data'),
+    Input(component_id='measure_input', component_property='columns')
+]
 )
 def plot_projection(facts, rows, columns):
-    """this function makes a visualisation with the applied measures.
+    """this function makes visualisations for the applied measures and parameters.
     Args:
+        facts: list of strings
         rows: data in the datatable
         columns: list of datatable columnn names
 
     Returns:
-        graph of the raes_seir simulation model
+        two graphs of the raes_seir simulation model
     """
     input_measures = pd.DataFrame(
         rows, columns=[c['name'] for c in columns]).to_dict('list')
@@ -178,7 +180,7 @@ def plot_projection(facts, rows, columns):
                              mode='lines',
                              name='Actual_hospitalized')
                   )
-    fig.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_sex["CASES"],
+    fig.add_trace(go.Scatter(x=pv_sex["DATE"], y=pv_sex["CASES"],
                              mode='lines',
                              name='Actual_confirmed')
                   )
@@ -186,13 +188,39 @@ def plot_projection(facts, rows, columns):
                              mode='lines',
                              name='Actual_deaths',
                              ))
+    fig.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN_ICU"],
+                             mode='lines',
+                             name='Actual_ICU')
+                  )
     updated_fig = go.Figure()
     for fact in facts:
         for element in fig['data']:
             if fact in element['name']:
                 updated_fig.add_trace(element)
     updated_fig.update_layout(temp['layout'])
-    return updated_fig
+
+    # SEIR visualisation
+    expert_fig = go.Figure()
+    for element in temp['data']:
+        if element["name"] in ['S', 'I', 'R']:
+            element["name"] = MAPPING_LABELS[element['name']]
+            expert_fig.add_trace(element)
+    expert_layout = temp['layout'].copy()
+    expert_layout["yaxis_title"] = "Number of people"
+    expert_layout["title"] = "Population Status Covid19"
+    expert_fig.update_layout(expert_layout)
+    return updated_fig, expert_fig
+
+
+@APP.callback(
+    Output("collapse", "is_open"),
+    [Input("collapse-button", "n_clicks")],
+    [State("collapse", "is_open")],
+)
+def toggle_collapse(n_clicks, is_open):
+    if n_clicks:
+        return not is_open
+    return is_open
 
 
 if __name__ == '__main__':
