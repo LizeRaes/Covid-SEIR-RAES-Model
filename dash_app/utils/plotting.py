@@ -25,6 +25,15 @@ def plot_dataframe(dataframe: pd.DataFrame, max_y_axis: int = None) -> Dict[str,
         for col in dataframe.columns
     ], 'layout': {
         "yaxis": yaxis,
-        "legend": {"orientation": "h"},
-        #"xaxis": {"rangeslider": {}}
+        "xaxis": {"rangeslider": {
+            "visible": True
+        }},
+        "yaxis_title": "Number of people",
+        "title": "Covid 19 projection",
+        "legend": {"orientation": "h", "y": 1, "x": 0},
+        "font": {
+            "family": "Roboto",
+            "size": 14,
+            "color": "#1372B3"
+        }
     }}

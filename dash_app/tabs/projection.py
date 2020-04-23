@@ -2,6 +2,7 @@
 """
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 import pandas as pd
 import dash_table
 
@@ -10,6 +11,8 @@ params = [
 ]
 example_measures = pd.read_excel(
     "dash_app/data/param_test.xlsx", sheet_name='R0')
+
+example_measures['Date'] = pd.to_datetime(example_measures['Date']).dt.date
 
 facts = dcc.Dropdown(
     id='facts',
@@ -23,53 +26,56 @@ facts = dcc.Dropdown(
     multi=True
 )
 
+# the style arguments for the sidebar
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": '119px',
+    "left": 0,
+    "bottom": 0,
+    "width": "20rem",
+    "padding": "2rem 1rem",
+    "background-color": "#4E4E4E",
+}
 
-tab_layout = html.Div([
-    # Left filter pane
-    html.Div(
-        [
-            facts,
-            dash_table.DataTable(
-                id='measure_input',
-                columns=(
-                    [{'id': p, 'name': p} for p in params]
-                ),
-                data=example_measures.to_dict('records'),
-                editable=True,
-                row_deletable=True,
-                style_cell={
-                    'height': 'auto',
-                    'minWidth': '0px', 'maxWidth': '2px',
-                    'whiteSpace': 'normal'
-                },
-                style_data_conditional=[
-                    {
-                        'if': {'row_index': 'odd'},
-                        'backgroundColor': 'rgb(248, 248, 248)'
-                    }
-                ],
-                style_header={
-                    'backgroundColor': 'rgb(230, 230, 230)',
-                    'fontWeight': 'bold'
-                }
+# the styles for the main content position it to the right of the sidebar and
+# add some padding.
+CONTENT_STYLE = {
+    "margin-left": "22rem",
+    "margin-right": "2rem",
+    "padding": "2rem 1rem",
+}
+
+sidebar = html.Div(
+    [
+        html.H5("Scenario generator", style={'margin-bottom': "20px"}),
+        dash_table.DataTable(
+            id='measure_input',
+            columns=(
+                [{'id': p, 'name': p} for p in params]
             ),
-            html.Button('Add a measure', id='editing-rows-button', n_clicks=0),
+            data=example_measures.to_dict('records'),
+            editable=True,
+            row_deletable=True
+        ),
+        html.Button('+ Add measure', id='editing-rows-button', n_clicks=0),
+        html.Hr()
+    ],
+    style=SIDEBAR_STYLE
+)
 
-            # dcc.DatePickerRange(
-            #     id='my-date-picker-range',
-            #     start_date_placeholder_text="Start Period",
-            #     end_date_placeholder_text="End Period",
-            #     calendar_orientation='vertical',
-            #     start_date=datetime.date(2020, 3, 1),
-            #     end_date=datetime.datetime.today()
-            # )
-        ]
-    ),
-    html.Div([
+content = html.Div(
+    [
+        facts,
         html.Div(children=[
             dcc.Graph(
                 id='projection-chart'
             )]
-            )
-    ])
+        )
+    ],
+    id="page-content",
+    style=CONTENT_STYLE)
+
+
+tab_layout = html.Div([
+    sidebar, content
 ])

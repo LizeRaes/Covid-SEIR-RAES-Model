@@ -35,13 +35,20 @@ def build_banner():
                 id="banner-text",
                 children=[
                     dbc.Row([
-                        dbc.Col(html.Img(id="logo", src=APP.get_asset_url(
-                            "virus_white.svg")), width=1),
-                        dbc.Col(html.H5("Covid-19 Dashboard"))
+                        dbc.Col(
+                            html.Div([
+                                html.Img(id="logo", src=APP.get_asset_url("virus_white.svg"), style={'display': 'inline-block'}),
+                                html.H5("Covid-19 Dashboard", style={'display': 'inline-block'})])
+                        ),
+                        dbc.Col(
+                            html.A([
+                                html.Img(id="git_img", src=APP.get_asset_url("git.png"))
+                            ], href='https://github.com/LizeRaes/Covid-SEIR-RAES-Model', target="_blank", style={'float': 'right', 'margin-right': '20px'})
+                        )
                     ])
-                ],
-            )
-        ],
+                    ,
+                ])
+        ]
     )
 
 # Create HTML structure

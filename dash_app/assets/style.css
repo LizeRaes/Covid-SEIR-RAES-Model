@@ -1,6 +1,11 @@
+/*Body remove overflow that appeared from nowhere */
+body{
+	overflow-x: hidden;
+}
+
 /* banner visuals */
 .banner{
-	background-color: #1372B3
+	background-color: #0f598a;
 }
 
 /* virus icon */
@@ -22,7 +27,7 @@
 
 	color: #FFFFFF;
 
-    margin-left: -40px;
+    margin-left: 10px;
     margin-top: 15px;
     margin-bottom: 10px;
 
@@ -34,8 +39,6 @@
   }
 
 /* tabs visuals */
-
-
 .jsx-2137964197.tab.custom-tab{
 	background-color: #1372B3;
     color: #fff;
@@ -65,9 +68,81 @@
 }
 
 .tab--selected.jsx-2137964197{
-	background-color: #0f598a;
+	background-color: #0f598a !important;
 }
 
 .tab--selected.jsx-2137964197:hover{
 	background-color: #0f598a !important;
+}
+
+/* max width for the Dropdown */
+.Select-control{
+	max-width: 500px;
+}
+
+/* table header */
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner th{
+	background-color: transparent !important;
+	color: #fff;
+	
+	font-family: Roboto;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 17px;
+	
+	text-align: left !important;
+	
+	border-color: transparent !important;
+	border-width: 2px 4px;
+}
+
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner tr:hover{
+	background-color: transparent !important;
+}
+
+/* table cells */
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner td{
+	background-color: #666666 !important;
+	color: #fff;
+	
+	font-family: Roboto;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 15px !important;
+	
+	text-align: center !important;
+	
+	border-color: transparent !important;
+	border-width: 3px 8px !important;
+}
+
+/* button style */
+button{
+	color: #1892E6;
+	background-color: transparent;
+	
+	font-family: Roboto;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 18px;
+	
+	margin-top: 16px;
+	
+	border: 1px solid #1B8EDC;
+	box-sizing: border-box;
+}
+
+/* h5 text used for sidebar titles */
+h5{
+	font-family: Roboto;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 24px;
+
+	color: #FFFFFF;
+}
+
+/* horizontal line */
+hr{
+	border: 1px solid #666666;
 }
