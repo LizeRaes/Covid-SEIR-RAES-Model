@@ -12,4 +12,4 @@ WORKDIR /app
 
 EXPOSE 8080
 
-ENTRYPOINT ["gunicorn", "-c", "gunicorn.config.py", "app:server"]
+ENTRYPOINT ["gunicorn", "-c", "gunicorn.config.py", "app:SERVER"]

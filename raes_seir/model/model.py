@@ -169,13 +169,13 @@ class Model:
         
         calc = [i * proportion for i in hospitalList]
         
-        model['die_today'] = calc
+        model['deaths_today'] = calc
         return model
 
     def generate_projection(actuals, param, R0s):
         #print(actuals)
-        print(param)
-        print(R0s)
+        #print(param)
+        #print(R0s)
         
         start_time = time.time()
         
@@ -222,9 +222,9 @@ class Model:
         
         end_time = time.time()
         
-        print(model)
+        #print(model)
         
-        print("--- %s seconds ---" % (end_time - start_time))
+        #print("--- %s seconds ---" % (end_time - start_time))
         return model
   
     #TO DO
