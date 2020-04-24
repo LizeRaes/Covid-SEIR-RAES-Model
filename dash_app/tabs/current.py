@@ -23,20 +23,28 @@ title_font = dict(
 )
 
 # Load CSV files from https://epistat.sciensano.be
-df_sex = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.csv', sep=',', encoding='latin-1')
+URL_epistat = "https://epistat.sciensano.be/Data/"
+
+df_sex = pd.read_csv(URL_epistat + 'COVID19BE_CASES_AGESEX.csv', sep=',', encoding='latin-1')
 # df_muni = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_CASES_MUNI.csv', sep=',', encoding='latin-1')
-df_muni_cum = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_CASES_MUNI_CUM.csv', sep=',', encoding='latin-1',
-                          dtype={"NIS5": str})
-df_hosp = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_HOSP.csv', sep=',', encoding='latin-1')
-df_mort = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_MORT.csv', sep=',', encoding='latin-1')
-df_tests = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_tests.csv', sep=',', encoding='latin-1')
+df_muni_cum = pd.read_csv(URL_epistat + 'COVID19BE_CASES_MUNI_CUM.csv', sep=',', encoding='latin-1', dtype={"NIS5": str})
+df_hosp = pd.read_csv(URL_epistat + 'COVID19BE_HOSP.csv', sep=',', encoding='latin-1')
+df_mort = pd.read_csv(URL_epistat + 'COVID19BE_MORT.csv', sep=',', encoding='latin-1')
+df_tests = pd.read_csv(URL_epistat + 'COVID19BE_tests.csv', sep=',', encoding='latin-1')
 
 # replacing na values in df_sex
 df_sex["SEX"].fillna("Unknown", inplace=True)
 df_sex['SEX'] = df_sex['SEX'].map({"F": "Female", "M": "Male", "Unknown": "Unknown"})
 
+# replacing na values in df_mort
+df_mort["SEX"].fillna("Unknown", inplace=True)
+df_mort['SEX'] = df_mort['SEX'].map({"F": "Female", "M": "Male", "Unknown": "Unknown"})
+
+## replace na values in df_mort
+df_mort["AGEGROUP"].fillna("Unknown", inplace=True)
+
 # PIVOTS
-pv_sex = pd.pivot_table(df_sex, values='CASES', columns=['SEX'], aggfunc=np.sum)
+#pv_sex = pd.pivot_table(df_sex, values='CASES', columns=['SEX'], aggfunc=np.sum)
 pv_hosp = df_hosp.groupby(['DATE'], as_index=False).sum()
 pv_mort = df_mort.groupby(['DATE'], as_index=False).sum()
 pv_mort_age = df_mort.groupby(['AGEGROUP'], as_index=False).sum()
@@ -48,7 +56,9 @@ df_muni_cum["CASES"] = pd.to_numeric(df_muni_cum["CASES"])
 # df_muni_cum["Regions"] = np.where(df_muni_cum["TX_DESCR_NL"] == df_muni_cum["TX_DESCR_FR"],
 #                                   df_muni_cum["TX_DESCR_NL"],
 #                                   df_muni_cum["TX_DESCR_NL"] + '#' + df_muni_cum["TX_DESCR_FR"])
-df_muni_cum['ID'] = df_muni_cum['TX_RGN_DESCR_FR'].map({"Région flamande": "BE2", "Région wallonne": "BE3", "Région de Bruxelles-Capitale": "BE4"})
+df_muni_cum['ID'] = df_muni_cum['TX_RGN_DESCR_FR'].map({"Région flamande": "BE2",
+                                                        "Région wallonne": "BE3",
+                                                        "Région de Bruxelles-Capitale": "BE4"})
 df_muni_cum["Regions"] = df_muni_cum['ID'] + df_muni_cum['NIS5']
 
 # Read in geojson
@@ -123,7 +133,7 @@ fig_hosp.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN_ECMO"],
 # Add title to the plot
 fig_hosp.update_layout(
     title_text="Covid-19 hospitalisation cases (count per day)",
-    # xaxis_title="Date",
+    xaxis_title="<- Select your time frame by dragging the sliders ->",
     yaxis_title="Number of hospitalised people",
     font=title_font
 )
@@ -152,7 +162,7 @@ fig_line_deaths.add_trace(go.Scatter(x=pv_mort["DATE"], y=pv_mort["DEATHS"],
 # Add title to the plot
 fig_line_deaths.update_layout(
     title_text="Covid-19 deaths (count per day)",
-    # xaxis_title="Date",
+    xaxis_title="<- Select your time frame by dragging the sliders ->",
     yaxis_title="Number of deaths",
     font=title_font
 )
@@ -199,17 +209,33 @@ fig_bar_mort.update_layout(
     font=title_font
 )
 
-# Create pie chart
-fig_pie = px.pie(df_sex, values='CASES', title="Cases by sex", names="SEX")
-
-# Adjust display
-fig_pie.update_traces(marker=dict(colors=colours_list))
+# Create pie charts
+fig_pie = px.pie(df_sex, values='CASES', names="SEX",
+                 color_discrete_map={
+                     "Male": colours_list[0],
+                     "Female": colours_list[1],
+                     "Unknown": colours_list[2]
+                 },
+                 height=350)
+fig_pie_death = px.pie(df_mort, values='DEATHS', names="SEX",
+                       color_discrete_map={
+                           "Male": colours_list[0],
+                           "Female": colours_list[1],
+                           "Unknown": colours_list[2]
+                       },
+                       height=350)
 
 # Add title to the plot
 fig_pie.update_layout(
     title_text="Covid_19 cases (total count per gender)",
     font=title_font
 )
+
+fig_pie_death.update_layout(
+    title_text="Covid_19 deaths (total count per gender)",
+    font=title_font
+)
+
 
 # Build the Layout of the dashboard
 tab_layout = html.Div(
@@ -256,10 +282,17 @@ tab_layout = html.Div(
                 width=9
             ),
             dbc.Col(
-                dcc.Graph(
-                    id='pie_chart_sex',
-                    figure=fig_pie
-                ),
+                [
+                    dcc.Graph(
+                        id='pie_chart_sex',
+                        figure=fig_pie
+                    ),
+                    dcc.Graph(
+                        id="pie_chart_death",
+                        figure=fig_pie_death
+                    )
+                ],
+                style={'margin-top': "51px"},
                 width=3
             )
         ])

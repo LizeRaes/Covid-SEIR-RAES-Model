@@ -223,6 +223,7 @@ def toggle_collapse(n_clicks, is_open):
     return is_open
 
 
+# Callback for the buttons to change the map plot displayed
 @APP.callback(
     Output("map_plot", "figure"),
     [Input("muni_map", "n_clicks_timestamp"),
@@ -240,9 +241,6 @@ def change_map_figure(*args):
             return current.fig_map_prov
         else:
             return current.fig_map_muni
-
-
-
 
 
 if __name__ == '__main__':
