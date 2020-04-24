@@ -145,11 +145,11 @@ def add_row(n_clicks, rows, columns):
     Output(component_id='projection-chart', component_property='figure'),
     Output(component_id='expert-chart', component_property='figure')
 ],
-[
-    Input('facts', 'value'),
-    Input(component_id='measure_input', component_property='data'),
-    Input(component_id='measure_input', component_property='columns')
-]
+    [
+        Input('facts', 'value'),
+        Input(component_id='measure_input', component_property='data'),
+        Input(component_id='measure_input', component_property='columns')
+    ]
 )
 def plot_projection(facts, rows, columns):
     """this function makes visualisations for the applied measures and parameters.
@@ -221,6 +221,28 @@ def toggle_collapse(n_clicks, is_open):
     if n_clicks:
         return not is_open
     return is_open
+
+
+@APP.callback(
+    Output("map_plot", "figure"),
+    [Input("muni_map", "n_clicks_timestamp"),
+     Input("prov_map", "n_clicks_timestamp")]
+)
+def change_map_figure(*args):
+    buttons = ["muni_map", "prov_map"]
+
+    args = [0 if i is None else i for i in args]
+    if len(args) > 0:
+        latest_time = max(args)
+        index_of_latest_time = args.index(latest_time)
+
+        if buttons[index_of_latest_time] == "prov_map":
+            return current.fig_map_prov
+        else:
+            return current.fig_map_muni
+
+
+
 
 
 if __name__ == '__main__':

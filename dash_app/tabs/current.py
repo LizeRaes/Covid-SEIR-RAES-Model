@@ -55,17 +55,44 @@ df_muni_cum["Regions"] = df_muni_cum['ID'] + df_muni_cum['NIS5']
 with open("dash_app/assets/municipalities_belgium.geojson") as response:
     municipalities = json.load(response)
 
-# Create a map
-fig_map = px.choropleth_mapbox(df_muni_cum, geojson=municipalities, locations='Regions', color='CASES',
-                               featureidkey="properties.shn",
-                               mapbox_style="carto-positron",
-                               zoom=6, center={"lat": 50.5039, "lon": 4.4699},
-                               opacity=0.5,
-                               labels={'CASES': 'Cases'}
-                               )
+df_muni_cum[["NaN", "Provinces1"]] = df_muni_cum["TX_PROV_DESCR_NL"].str.split(" ", expand=True, )
+df_muni_cum["Provinces"] = np.where(df_muni_cum["TX_RGN_DESCR_FR"] == "Région de Bruxelles-Capitale", "Brussel", df_muni_cum["Provinces1"])
+
+df_muni_agg = df_muni_cum["CASES"].groupby(df_muni_cum["Provinces"]).sum().reset_index()
+
+with open("dash_app/assets/provinces.geojson") as response:
+    provinces = json.load(response)
+
+# Create municipalities map
+fig_map_muni = px.choropleth_mapbox(df_muni_cum, geojson=municipalities, locations='Regions', color='CASES',
+                                    featureidkey="properties.shn",
+                                    mapbox_style="carto-positron",
+                                    zoom=7, center={"lat": 50.5039, "lon": 4.4699},
+                                    opacity=0.5,
+                                    labels={'CASES': 'Cases'},
+                                    height=600
+                                    )
+
 
 # Add title to the plot
-fig_map.update_layout(
+fig_map_muni.update_layout(
+    title_text="Covid_19 cases (count)",
+    font=title_font
+)
+
+
+# Create provinces map
+fig_map_prov = px.choropleth_mapbox(df_muni_agg, geojson=provinces, locations='Provinces', color='CASES',
+                                    featureidkey="properties.province",
+                                    mapbox_style="carto-positron",
+                                    zoom=7, center={"lat": 50.5039, "lon": 4.4699},
+                                    opacity=0.5,
+                                    labels={'CASES': 'Cases'},
+                                    height=600
+                                    )
+
+# Add title to the plot
+fig_map_prov.update_layout(
     title_text="Covid_19 cases (count)",
     font=title_font
 )
@@ -193,21 +220,14 @@ tab_layout = html.Div(
                     id='line_chart_hosp',
                     figure=fig_hosp
                 ),
-                width=6
+                width=7
             ),
             dbc.Col(
                 dcc.Graph(
                     id='bar_chart_test',
                     figure=fig_bar_tests
                 ),
-                width=3
-            ),
-            dbc.Col(
-                dcc.Graph(
-                    id='map_chart',
-                    figure=fig_map
-                ),
-                width=3
+                width=5
             )
         ]),
         dbc.Row([
@@ -216,14 +236,24 @@ tab_layout = html.Div(
                     id='line_chart_morts',
                     figure=fig_line_deaths
                 ),
-                width=6
+                width=7
             ),
             dbc.Col(
                 dcc.Graph(
                     id='bar_chart_mort',
                     figure=fig_bar_mort
                 ),
-                width=3
+                width=5
+            )
+        ]),
+        dbc.Row([
+            dbc.Col(
+                [
+                    html.Button('Municipalities', id='muni_map', style={"margin-left": "80px"}),
+                    html.Button('Provinces', id='prov_map', style={"margin-left": "10px"}),
+                    dcc.Graph(id="map_plot", figure={})
+                ],
+                width=9
             ),
             dbc.Col(
                 dcc.Graph(
