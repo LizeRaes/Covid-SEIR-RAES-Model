@@ -22,7 +22,7 @@ class Parameters:
     self.date_more_20_death = date.fromisoformat('2020-03-19')
     self.days_before_20 = 10
     self.pivotDate = self.date_more_20_death - timedelta(days=self.days_before_20) - timedelta(days=self.avg_delay_infection)
-    self.confirmed_pivot_date = 33
+    self.confirmed_pivot_date = 29
     self.cumul_confirmed_pivot_date = 200
     self.gamma = 1/self.avg_contagious_period
     self.date_X = date.fromisoformat('2020-02-28')
