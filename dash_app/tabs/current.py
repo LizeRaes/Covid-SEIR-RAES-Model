@@ -70,7 +70,7 @@ fig_map_muni = px.choropleth_mapbox(df_muni_cum, geojson=municipalities, locatio
                                     zoom=7, center={"lat": 50.5039, "lon": 4.4699},
                                     opacity=0.5,
                                     labels={'CASES': 'Cases'},
-                                    height=600
+                                    height=700
                                     )
 
 
@@ -88,7 +88,7 @@ fig_map_prov = px.choropleth_mapbox(df_muni_agg, geojson=provinces, locations='P
                                     zoom=7, center={"lat": 50.5039, "lon": 4.4699},
                                     opacity=0.5,
                                     labels={'CASES': 'Cases'},
-                                    height=600
+                                    height=700
                                     )
 
 # Add title to the plot
