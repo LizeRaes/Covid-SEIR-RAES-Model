@@ -39,7 +39,7 @@ body{
   }
 
 /* tabs visuals */
-.jsx-2137964197.tab.custom-tab{
+.jsx-3468109796.tab.custom-tab{
 	background-color: #1372B3;
     color: #fff;
 	border: 1px solid #1372B3;
@@ -51,7 +51,7 @@ body{
 	text-align: center;
 }
 
-.tab.jsx-2137964197{
+.tab.jsx-3468109796{
 	background-color: #1372B3;
     color: #fff;
 	border: 1px solid #1372B3;
@@ -63,15 +63,11 @@ body{
 	text-align: center;
 }
 
-.tab.jsx-2137964197:hover{
+.tab.jsx-3468109796:hover{
 	background-color: #0f598a;
 }
 
-.tab--selected.jsx-2137964197{
-	background-color: #0f598a !important;
-}
-
-.tab--selected.jsx-2137964197:hover{
+.tab--selected.jsx-3468109796{
 	background-color: #0f598a !important;
 }
 
@@ -130,6 +126,13 @@ button{
 	
 	border: 1px solid #1B8EDC;
 	box-sizing: border-box;
+}
+
+#facts{
+	color: #1892E6;
+	font-family: Roboto;
+	font-style: normal;
+	font-weight: normal;
 }
 
 /* h5 text used for sidebar titles */
