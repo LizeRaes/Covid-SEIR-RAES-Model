@@ -3,10 +3,10 @@ from datetime import date, timedelta
 
 class Parameters:
   def __init__(self):
-    self.icu_percentage = 0.22
-    self.ventilation_percentage = 0.16
+    self.icu_percentage_old = 0.22
+    self.ventilation_percentage_old = 0.16
     self.die_percentage = 0.0223
-    self.cases_hospital_percentage = 0.49
+    self.cases_hospital_percentage_old = 0.49
     self.total_population = 11400000
     self.icu_capacity = 0
     self.ventilator_capacity = 0
@@ -15,18 +15,21 @@ class Parameters:
     self.contagious_speed = 0
     self.avg_stay_hospital = 12
     self.delay_confirmed_hospital = 1
-    self.avg_stay_icu = 0
-    self.avg_stay_ventilator = 0
+    self.avg_stay_icu = 12
+    self.avg_stay_ventilator = 12
     self.date_more_20_death = date.fromisoformat('2020-03-19')
     self.days_before_20 = 10
     self.pivotDate = self.date_more_20_death - timedelta(days=self.days_before_20) - timedelta(days=self.avg_delay_infection)
-    self.confirmed_pivot_date = 33
+    self.confirmed_pivot_date = 29
     self.cumul_confirmed_pivot_date = 200
     self.gamma = 1/self.avg_contagious_period
     self.date_X = date.fromisoformat('2020-02-28')
     self.estim_percent_infect_date_X = 0.00055
     self.cumul_infect_actuals_date_X = 314 #on real date X + avg_delay_infection
     self.undertest_factor = self.estim_percent_infect_date_X * self.total_population / self.cumul_infect_actuals_date_X
+    self.cases_hospital_percentage = self.cases_hospital_percentage_old * (1/self.undertest_factor)
+    self.icu_percentage = self.icu_percentage_old * self.cases_hospital_percentage
+    self.ventilation_percentage = self.ventilation_percentage_old * self.cases_hospital_percentage
 
   def set_icu_pc(self, value):
     self.icu_percentage = value

@@ -135,32 +135,78 @@ class Model:
         model['confirmed_cumul']=calc
         return model
 
+    # compute a vector where f(x) = sum(from (x-delayFrom) to (x-delayTo)) of (data * proportion)
+    # for each value of the vector is the sum of data for the period delayFrom before value to delayTo before value
+    def roling_sum_proportion(data, delayFrom, delayTo, proportion):
+        
+        calc = [0]*len(data)
+        calcIn = [0]*len(data)
+        calcOut = [0]*len(data)
+        
+        for i in range(delayTo, len(calc)):
+            calcIn[i] = data[i-delayTo]*proportion
+        
+        for i in range(delayFrom, len(calc)):
+            calcOut[i] = data[i-delayFrom]*proportion
+        
+        for i in range(1,len(calc)):
+            calc[i] = calc[i-1]+calcIn[i]-calcOut[i]
+        
+        return (calc, calcIn, calcOut)
+
+
     def generate_hospital_today(model, param):
-        confirmedList = model['confirmed_today'].to_list()
+        infected = model['dS'].to_list()
         delay = param.delay_confirmed_hospital
         length = param.avg_stay_hospital
+        delayInfectTest = param.avg_delay_infection
+        
         proportion = param.cases_hospital_percentage
         
-        calc = [0]*len(confirmedList)
-        
-        start = delay+length
-        
-        for i in range(start, len(calc)):
-            count = 0
-            for j in range(i-delay-length+1,i-delay+1):
-                count += confirmedList[j]
-            calc[i] = count*proportion
+        (calc, calcIn, calcOut) = Model.roling_sum_proportion(infected, delay+delayInfectTest+length, delay+delayInfectTest, proportion)
         
         model['hospital_today']=calc
+        model['hospital_in_today']=calcIn
+        model['hospital_out_today']=calcOut
         return model
 
+#    def generate_ICU_today(model, param):
+#        hospitalList = model['hospital_today'].to_list()
+#        proportion = param.icu_percentage
+#        
+#        calc = [i * proportion for i in hospitalList]
+#        
+#        model['ICU_today'] = calc
+#        return model
+
     def generate_ICU_today(model, param):
-        hospitalList = model['hospital_today'].to_list()
+        infected = model['dS'].to_list()
+        delay = param.delay_confirmed_hospital
+        length = param.avg_stay_icu
+        delayInfectTest = param.avg_delay_infection
+        
         proportion = param.icu_percentage
         
-        calc = [i * proportion for i in hospitalList]
+        (calc, calcIn, calcOut) = Model.roling_sum_proportion(infected, delay+delayInfectTest+length, delay+delayInfectTest, proportion)
         
-        model['ICU_today'] = calc
+        model['ICU_today']=calc
+        model['ICU_in_today']=calcIn
+        model['ICU_out_today']=calcOut
+        return model
+
+    def generate_ventilation_today(model, param):
+        infected = model['dS'].to_list()
+        delay = param.delay_confirmed_hospital
+        length = param.avg_stay_ventilator
+        delayInfectTest = param.avg_delay_infection
+        
+        proportion = param.ventilation_percentage
+        
+        (calc, calcIn, calcOut) = Model.roling_sum_proportion(infected, delay+delayInfectTest+length, delay+delayInfectTest, proportion)
+        
+        model['ventilation_today']=calc
+        model['ventilation_in_today']=calcIn
+        model['ventilation_out_today']=calcOut
         return model
 
     def generate_die_today(model, param):
@@ -218,7 +264,9 @@ class Model:
         model = Model.generate_confirmed_cumul(model,param)
         model = Model.generate_hospital_today(model,param)
         model = Model.generate_ICU_today(model,param)
+        model = Model.generate_ventilation_today(model,param)
         model = Model.generate_die_today(model,param)
+        model = Model.generate_die_cumul(model,param)
         
         end_time = time.time()
         
