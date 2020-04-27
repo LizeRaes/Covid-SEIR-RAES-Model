@@ -8,6 +8,7 @@ import dash_bootstrap_components as dbc
 # from app import *
 import numpy as np
 import plotly.express as px
+from plotly.subplots import make_subplots
 # from urllib.request import urlopen
 
 import json
@@ -27,7 +28,8 @@ URL_epistat = "https://epistat.sciensano.be/Data/"
 
 df_sex = pd.read_csv(URL_epistat + 'COVID19BE_CASES_AGESEX.csv', sep=',', encoding='latin-1')
 # df_muni = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_CASES_MUNI.csv', sep=',', encoding='latin-1')
-df_muni_cum = pd.read_csv(URL_epistat + 'COVID19BE_CASES_MUNI_CUM.csv', sep=',', encoding='latin-1', dtype={"NIS5": str})
+df_muni_cum = pd.read_csv(URL_epistat + 'COVID19BE_CASES_MUNI_CUM.csv', sep=',', encoding='latin-1',
+                          dtype={"NIS5": str})
 df_hosp = pd.read_csv(URL_epistat + 'COVID19BE_HOSP.csv', sep=',', encoding='latin-1')
 df_mort = pd.read_csv(URL_epistat + 'COVID19BE_MORT.csv', sep=',', encoding='latin-1')
 df_tests = pd.read_csv(URL_epistat + 'COVID19BE_tests.csv', sep=',', encoding='latin-1')
@@ -44,10 +46,13 @@ df_mort['SEX'] = df_mort['SEX'].map({"F": "Female", "M": "Male", "Unknown": "Unk
 df_mort["AGEGROUP"].fillna("Unknown", inplace=True)
 
 # PIVOTS
-#pv_sex = pd.pivot_table(df_sex, values='CASES', columns=['SEX'], aggfunc=np.sum)
+# pv_sex = pd.pivot_table(df_sex, values='CASES', columns=['SEX'], aggfunc=np.sum)
 pv_hosp = df_hosp.groupby(['DATE'], as_index=False).sum()
 pv_mort = df_mort.groupby(['DATE'], as_index=False).sum()
 pv_mort_age = df_mort.groupby(['AGEGROUP'], as_index=False).sum()
+
+pv_mort = pv_mort.sort_values(by=["DATE"])
+pv_mort["DEATHS_CUM"] = pv_mort["DEATHS"].cumsum(axis=None)
 
 # Map data changes
 # Replace all less than 5s with 3 and convert data to numeric
@@ -66,7 +71,8 @@ with open("dash_app/assets/municipalities_belgium.geojson") as response:
     municipalities = json.load(response)
 
 df_muni_cum[["NaN", "Provinces1"]] = df_muni_cum["TX_PROV_DESCR_NL"].str.split(" ", expand=True, )
-df_muni_cum["Provinces"] = np.where(df_muni_cum["TX_RGN_DESCR_FR"] == "Région de Bruxelles-Capitale", "Brussel", df_muni_cum["Provinces1"])
+df_muni_cum["Provinces"] = np.where(df_muni_cum["TX_RGN_DESCR_FR"] == "Région de Bruxelles-Capitale", "Brussel",
+                                    df_muni_cum["Provinces1"])
 
 df_muni_agg = df_muni_cum["CASES"].groupby(df_muni_cum["Provinces"]).sum().reset_index()
 
@@ -83,13 +89,11 @@ fig_map_muni = px.choropleth_mapbox(df_muni_cum, geojson=municipalities, locatio
                                     height=700
                                     )
 
-
 # Add title to the plot
 fig_map_muni.update_layout(
     title_text="Covid_19 cases (count)",
     font=title_font
 )
-
 
 # Create provinces map
 fig_map_prov = px.choropleth_mapbox(df_muni_agg, geojson=provinces, locations='Provinces', color='CASES',
@@ -108,33 +112,37 @@ fig_map_prov.update_layout(
 )
 
 # Create Covid-19 cases (count per day) plot
-fig_hosp = go.Figure()
-fig_hosp.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN"],
-                              mode='lines',
-                              name='Total in',
-                              line=dict(color=colours_list[0])
-                              ))
+fig_hosp = make_subplots(specs=[[{"secondary_y": True}]])
+fig_hosp.add_trace(go.Bar(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN"],
+                          name='Total',
+                          marker_color=colours_list[0],
+                          opacity=0.6),
+                   secondary_y=False
+                   )
 fig_hosp.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN_ICU"],
                               mode='lines',
-                              name='Total in ICU',
-                              line=dict(color=colours_list[1])
-                              ))
+                              name='in ICU',
+                              line=dict(color=colours_list[5])),
+                   secondary_y=True
+                   )
 fig_hosp.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN_RESP"],
                               mode='lines',
-                              name='Total in resp',
-                              line=dict(color=colours_list[2])
-                              ))
+                              name='under respiratory support',
+                              line=dict(color=colours_list[4])),
+                   secondary_y=True
+                   )
 fig_hosp.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN_ECMO"],
                               mode='lines',
-                              name='Total in ECMO',
-                              line=dict(color=colours_list[3])
-                              ))
+                              name='on ECMO',
+                              line=dict(color=colours_list[3])),
+                   secondary_y=True
+                   )
 
 # Add title to the plot
 fig_hosp.update_layout(
     title_text="Covid-19 hospitalisation cases (count per day)",
     xaxis_title="<- Select your time frame by dragging the sliders ->",
-    yaxis_title="Number of hospitalised people",
+    yaxis_title="Total number of hospitalized patients",
     font=title_font
 )
 
@@ -152,12 +160,20 @@ fig_hosp.update_layout(
 fig_hosp.update_layout(legend_orientation="h")
 
 # Create line graph (deaths)
-fig_line_deaths = go.Figure()
+fig_line_deaths = make_subplots(specs=[[{"secondary_y": True}]])
 fig_line_deaths.add_trace(go.Scatter(x=pv_mort["DATE"], y=pv_mort["DEATHS"],
                                      mode='lines',
-                                     name='Total in',
+                                     name='Mortality per day',
                                      line=dict(color=colours_list[4])
-                                     ))
+                                     ),
+                          secondary_y=True)
+fig_line_deaths.add_trace(go.Bar(x=pv_mort["DATE"], y=pv_mort["DEATHS_CUM"],
+                                 name="Mortality cumulative",
+                                 marker_color=colours_list[0],
+                                 opacity=0.5),
+                          secondary_y=False)
+
+fig_line_deaths.update_layout(legend_orientation="h")
 
 # Add title to the plot
 fig_line_deaths.update_layout(
@@ -198,8 +214,9 @@ fig_bar_tests.update_layout(
 )
 
 # Create horizontal bar chart (deaths)
-fig_bar_mort = px.bar(pv_mort_age, x="DEATHS", y="AGEGROUP", orientation='h')
+fig_bar_mort = px.bar(pv_mort_age, x="DEATHS", y="AGEGROUP", text="DEATHS", orientation='h')
 fig_bar_mort.update_traces(marker_color=colours_list[5])
+fig_bar_mort.update_traces(textposition='outside')
 
 # Add title to the plot
 fig_bar_mort.update_layout(
@@ -235,7 +252,6 @@ fig_pie_death.update_layout(
     title_text="Covid_19 deaths (total count per gender)",
     font=title_font
 )
-
 
 # Build the Layout of the dashboard
 tab_layout = html.Div(
