@@ -218,6 +218,15 @@ class Model:
         model['die_today'] = calc
         return model
 
+    def generate_die_cumul(model, param):
+        cumulList = model['die_today'].to_list()
+        
+        calc = [0]*len(cumulList)
+        for i in range(1, len(calc)):
+            calc[i] = calc[i-1]+cumulList[i]
+        model['die_cumul']=calc
+        return model
+
     def generate_projection(actuals, param, R0s):
         print(actuals)
         print(param)
