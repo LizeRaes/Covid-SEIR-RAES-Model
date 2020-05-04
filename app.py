@@ -46,12 +46,18 @@ def build_banner():
                                     "virus_white.svg"), style={'display': 'inline-block'}),
                                 html.H5("Covid-19 Dashboard", style={'display': 'inline-block'})])
                         ),
-                        dbc.Col(
+                        dbc.Col([
+                            html.A([
+                                html.Img(id="info_icn",
+                                         src=APP.get_asset_url("info-icon.png"))
+                            ], href='https://gzt.be/covid19-breathing-machine/seir-simulator-belgium', target="_blank",
+                                style={'float': 'right', 'margin-right': '20px', 'display': 'inline-block'}),
                             html.A([
                                 html.Img(id="git_img",
                                          src=APP.get_asset_url("git.png"))
-                            ], href='https://github.com/LizeRaes/Covid-SEIR-RAES-Model', target="_blank", style={'float': 'right', 'margin-right': '20px'})
-                        )
+                            ], href='https://github.com/LizeRaes/Covid-SEIR-RAES-Model', target="_blank",
+                                style={'float': 'right', 'margin-right': '20px', 'display': 'inline-block'})
+                        ])
                     ]),
                 ])
         ]
