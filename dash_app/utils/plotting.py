@@ -35,5 +35,6 @@ def plot_dataframe(dataframe: pd.DataFrame, max_y_axis: int = None) -> Dict[str,
             "family": "Roboto",
             "size": 14,
             "color": "#1372B3"
-        }
+        },
+        "hovermode": "x"
     }}
