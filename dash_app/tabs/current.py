@@ -112,30 +112,26 @@ fig_map_prov.update_layout(
 )
 
 # Create Covid-19 cases (count per day) plot
-fig_hosp = make_subplots(specs=[[{"secondary_y": True}]])
+fig_hosp = go.Figure()
 fig_hosp.add_trace(go.Bar(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN"],
                           name='Total',
                           marker_color=colours_list[0],
-                          opacity=0.6),
-                   secondary_y=False
+                          opacity=0.6)
                    )
 fig_hosp.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN_ICU"],
                               mode='lines',
                               name='in ICU',
-                              line=dict(color=colours_list[5])),
-                   secondary_y=True
+                              line=dict(color=colours_list[5]))
                    )
 fig_hosp.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN_RESP"],
                               mode='lines',
                               name='under respiratory support',
-                              line=dict(color=colours_list[4])),
-                   secondary_y=True
+                              line=dict(color=colours_list[4]))
                    )
 fig_hosp.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN_ECMO"],
                               mode='lines',
                               name='on ECMO',
-                              line=dict(color=colours_list[3])),
-                   secondary_y=True
+                              line=dict(color=colours_list[3]))
                    )
 
 # Add title to the plot
@@ -143,7 +139,8 @@ fig_hosp.update_layout(
     title_text="Covid-19 hospitalisation cases (count per day)",
     xaxis_title="<- Select your time frame by dragging the sliders ->",
     yaxis_title="Total number of hospitalized patients",
-    font=title_font
+    font=title_font,
+    hovermode="x"
 )
 
 # Add range slider
@@ -160,20 +157,19 @@ fig_hosp.update_layout(
 fig_hosp.update_layout(legend_orientation="h")
 
 # Create line graph (deaths)
-fig_line_deaths = make_subplots(specs=[[{"secondary_y": True}]])
+fig_line_deaths = go.Figure()
 fig_line_deaths.add_trace(go.Scatter(x=pv_mort["DATE"], y=pv_mort["DEATHS"],
                                      mode='lines',
                                      name='Mortality per day',
                                      line=dict(color=colours_list[4])
-                                     ),
-                          secondary_y=True)
+                                     ))
 fig_line_deaths.add_trace(go.Bar(x=pv_mort["DATE"], y=pv_mort["DEATHS_CUM"],
                                  name="Mortality cumulative",
                                  marker_color=colours_list[0],
-                                 opacity=0.5),
-                          secondary_y=False)
+                                 opacity=0.5))
 
-fig_line_deaths.update_layout(legend_orientation="h")
+fig_line_deaths.update_layout(legend_orientation="h",
+                              hovermode="x")
 
 # Add title to the plot
 fig_line_deaths.update_layout(
