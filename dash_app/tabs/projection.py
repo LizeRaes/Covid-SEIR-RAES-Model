@@ -21,7 +21,6 @@ df_parameters = create_dataframe_from_parameters()
 facts = dcc.Dropdown(
     id='facts',
     options=[
-        {'label': 'Confirmed', 'value': 'confirmed'},
         {'label': 'Hospitalized', 'value': 'hospital'},
         {'label': 'Intensive Care', 'value': 'ICU'},
         {'label': 'Deaths', 'value': 'death'}
@@ -89,6 +88,8 @@ sidebar = html.Div(
 content = html.Div(
     [
         facts,
+        html.Br(),
+        html.Br(),
         html.Div(
             children=[
                 dcc.Graph(

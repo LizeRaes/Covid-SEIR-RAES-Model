@@ -177,7 +177,7 @@ def plot_projection(facts, rows, columns):
     fig = go.Figure()
     # Add traces
     for element in temp['data']:
-        if element["name"] in ['confirmed_today', 'hospital_today',
+        if element["name"] in ['hospital_today',
                                'ICU_today', 'confirmed_today', 'deaths_today', 'deaths_cumul']:
             element["name"] = 'Predicted_' + element["name"]
             element["line"] = dict(width=4, dash='dot')
@@ -194,16 +194,35 @@ def plot_projection(facts, rows, columns):
                              mode='lines',
                              name='Actual_deaths',
                              ))
+    fig.add_trace(go.Scatter(x=pv_mort["DATE"], y=pv_mort["DEATHS_CUM"],
+                             mode='lines',
+                             name='Actual_deaths_cumul',
+                             ))
     fig.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN_ICU"],
                              mode='lines',
                              name='Actual_ICU')
+                  )
+    test_output['ICU_capacity'] = 2200
+    fig.add_trace(go.Scatter(x=test_output.index, y=test_output['ICU_capacity'],
+                             mode='lines',
+                             name='ICU capacity')
                   )
     updated_fig = go.Figure()
     for fact in facts:
         for element in fig['data']:
             if fact in element['name']:
                 updated_fig.add_trace(element)
-    updated_fig.update_layout(temp['layout'])
+    updated_fig_layout = temp['layout'].copy()
+    updated_fig_layout['hovermode'] = 'x'
+    updated_fig.update_layout(updated_fig_layout)
+    updated_fig.update_layout(
+    hoverlabel=dict(
+        namelength=30
+    ),
+    title=dict(text=temp['layout']['title'], y=1, yanchor='top',
+    pad=dict(t=0)
+    )
+    )
 
     # SEIR visualisation
     expert_fig = go.Figure()
