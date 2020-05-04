@@ -26,7 +26,7 @@ facts = dcc.Dropdown(
         {'label': 'Intensive Care', 'value': 'ICU'},
         {'label': 'Deaths', 'value': 'death'}
     ],
-    value=['hospital'],
+    value=['hospital', 'ICU', 'death'],
     multi=True
 )
 
