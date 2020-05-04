@@ -54,6 +54,11 @@ CONTENT_STYLE = {
 sidebar = html.Div(
     [
         html.H5("Scenario generator", style={'margin-bottom': "20px"}),
+        html.A([
+            html.P('User Manual')
+        ], href='https://gzt.be/covid19-breathing-machine/seir-simulator-belgium/',
+        target="_blank"
+        ),
         dash_table.DataTable(
             id='measure_input',
             columns=(
