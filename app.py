@@ -177,7 +177,7 @@ def plot_projection(facts, rows, columns):
     fig = go.Figure()
     # Add traces
     for element in temp['data']:
-        if element["name"] in ['confirmed_today', 'hospital_today',
+        if element["name"] in ['hospital_today',
                                'ICU_today', 'confirmed_today', 'deaths_today', 'deaths_cumul']:
             element["name"] = 'Predicted_' + element["name"]
             element["line"] = dict(width=4, dash='dot')
@@ -193,6 +193,10 @@ def plot_projection(facts, rows, columns):
     fig.add_trace(go.Scatter(x=pv_mort["DATE"], y=pv_mort["DEATHS"],
                              mode='lines',
                              name='Actual_deaths',
+                             ))
+    fig.add_trace(go.Scatter(x=pv_mort["DATE"], y=pv_mort["DEATHS_CUM"],
+                             mode='lines',
+                             name='Actual_deaths_cumul',
                              ))
     fig.add_trace(go.Scatter(x=pv_hosp["DATE"], y=pv_hosp["TOTAL_IN_ICU"],
                              mode='lines',
