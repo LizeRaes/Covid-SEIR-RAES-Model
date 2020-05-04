@@ -93,6 +93,8 @@ sidebar = html.Div(
 content = html.Div(
     [
         facts,
+        html.Br(),
+        html.Br(),
         html.Div(
             children=[
                 dcc.Graph(

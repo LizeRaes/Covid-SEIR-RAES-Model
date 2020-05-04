@@ -208,8 +208,11 @@ def plot_projection(facts, rows, columns):
     updated_fig.update_layout(
     hoverlabel=dict(
         namelength=30
+    ),
+    title=dict(text=temp['layout']['title'], y=1, yanchor='top',
+    pad=dict(t=0)
     )
-)
+    )
 
     # SEIR visualisation
     expert_fig = go.Figure()
