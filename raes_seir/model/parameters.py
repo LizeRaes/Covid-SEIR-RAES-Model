@@ -28,7 +28,7 @@ class Parameters:
         self.cumul_confirmed_pivot_date = 200
         self.gamma = 1/self.avg_contagious_period
         self.date_X = date.fromisoformat('2020-02-28')
-        self.estim_percent_infect_date_X = 0.06
+        self.estim_percent_infect_date_X = 0.0006
         self.cumul_infect_actuals_date_X = 314  # on real date X + avg_delay_infection
         self.undertest_factor = self.estim_percent_infect_date_X * \
             self.total_population / self.cumul_infect_actuals_date_X
