@@ -172,7 +172,7 @@ def plot_projection(facts, rows, columns):
     # Add traces
     for element in temp['data']:
         if element["name"] in ['confirmed_today', 'hospital_today',
-                               'ICU_today', 'confirmed_today', 'deaths_today']:
+                               'ICU_today', 'confirmed_today', 'deaths_today', 'deaths_cumul']:
             element["name"] = 'Predicted_' + element["name"]
             element["line"] = dict(width=4, dash='dot')
             fig.add_trace(element)
