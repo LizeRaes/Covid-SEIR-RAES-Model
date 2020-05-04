@@ -32,33 +32,29 @@ facts = dcc.Dropdown(
 
 # the style arguments for the sidebar
 SIDEBAR_STYLE = {
-    "position": "fixed",
-    "top": '119px',
+    #'"position": "fixed",
+    #"top": '119px',
+    "height":"100%",
     "left": 0,
     "bottom": 0,
-    "width": "20rem",
+    #"width": "20rem",
     "padding": "2rem 1rem",
     "background-color": "#4E4E4E",
-    "overflow-y": "scroll",
+    #"overflow-y": "scroll",
     "overflow-x": "scroll"
 }
 
 # the styles for the main content position it to the right of the sidebar and
 # add some padding.
 CONTENT_STYLE = {
-    "margin-left": "22rem",
+    #"margin-left": "22rem",
     "margin-right": "2rem",
-    "padding": "2rem 1rem",
+    "padding": "2rem 1rem"
 }
 
 sidebar = html.Div(
     [
         html.H5("Scenario generator", style={'margin-bottom': "20px"}),
-        html.A([
-            html.P('User Manual')
-        ], href='https://gzt.be/covid19-breathing-machine/seir-simulator-belgium/',
-        target="_blank"
-        ),
         dash_table.DataTable(
             id='measure_input',
             columns=(
@@ -84,7 +80,7 @@ sidebar = html.Div(
                 ),
                 data=create_dataframe_from_parameters().to_dict('records'),
                 editable=False,
-        ),
+            ),
             id="collapse")
     ],
     style=SIDEBAR_STYLE
@@ -110,5 +106,14 @@ content = html.Div(
 
 
 tab_layout = html.Div([
-    sidebar, content
+    dbc.Row([
+        dbc.Col(
+            sidebar,
+            width=3
+        ),
+        dbc.Col(
+            content,
+            width=9
+        )
+    ])
 ])
