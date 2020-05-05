@@ -7,7 +7,7 @@ class Parameters:
     def __init__(self):
         self.icu_percentage_old = 0.22
         self.ventilation_percentage_old = 0.16
-        self.die_percentage = 0.043
+        self.die_percentage = 0.042
         self.cases_hospital_percentage_old = 0.49
         self.total_population = 11400000
         self.icu_capacity = 0
