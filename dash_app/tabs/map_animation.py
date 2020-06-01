@@ -33,11 +33,11 @@ df_muni["Regions"] = df_muni['ID'] + df_muni['NIS5']
 ## convert date column date format
 #df_muni['DATE'] = df_muni['DATE'].replace(r'\\n', '', regex=True)
 #print(type(df_muni['DATE']))
-df_muni['DATE'] = pd.to_datetime(str(df_muni['DATE']), format='%Y-%m-%d')
+df_muni['DATE1'] = pd.to_datetime(df_muni['DATE'])
 #df_muni['DATE'] = pd.to_datetime("01/03/2020")
 #df_muni['DATE'] = df_muni['DATE'].apply(lambda x: pd.to_datetime(x))
 ## extract day of week
-df_muni['DAY'] = df_muni["DATE"].apply(lambda x: x.strftime('%A'))
+df_muni['DAY'] = df_muni["DATE1"].dt.strftime('%A')
 ## Calculate cumulative value for each day
 #df_muni_cum = df_muni.groupby(['Regions', 'DATE']).sum().groupby(level=0).cumsum().reset_index()
 ## Calculate cumulative per municipality
