@@ -12,6 +12,7 @@ from dash.dependencies import Input, Output, State
 from dash_app.tabs import current
 from dash_app.tabs import parameters
 from dash_app.tabs import projection
+from dash_app.tabs import map_animation
 from dash_app.utils.plotting import plot_dataframe
 from dash_app.tabs.current import pv_hosp
 from dash_app.tabs.current import df_sex
@@ -97,10 +98,17 @@ APP.layout = html.Div(
             dcc.Tab(
                 id="Projection-tab",
                 label="Projection",
-                value="tab-3",
+                value="tab-2",
                 className="custom-tab",
                 selected_className="custom-tab--selected",
             ),
+            dcc.Tab(
+                id='map-tab',
+                label='Timelapse',
+                value='tab-3',
+                className="custom-tab",
+                selected_className="custom-tab--selected",
+            )
         ]),
         html.Div(id='tabs-content')
     ],
@@ -121,10 +129,10 @@ def render_content(tab):
     """
     if tab == 'tab-1':
         return current.tab_layout
-    # elif tab == 'tab-2':
-    #     return parameters.tab_layout
-    elif tab == 'tab-3':
+    elif tab == 'tab-2':
         return projection.tab_layout
+    elif tab == 'tab-3':
+        return map_animation.tab_layout
 
 
 @APP.callback(
@@ -207,6 +215,7 @@ def plot_projection(facts, rows, columns):
                              mode='lines',
                              name='ICU capacity')
                   )
+    print("Date " + min(pv_hosp["DATE"]))
     updated_fig = go.Figure()
     for fact in facts:
         for element in fig['data']:
@@ -216,12 +225,12 @@ def plot_projection(facts, rows, columns):
     updated_fig_layout['hovermode'] = 'x'
     updated_fig.update_layout(updated_fig_layout)
     updated_fig.update_layout(
-    hoverlabel=dict(
-        namelength=30
-    ),
-    title=dict(text=temp['layout']['title'], y=1, yanchor='top',
-    pad=dict(t=0)
-    )
+        hoverlabel=dict(
+            namelength=30
+        ),
+        title=dict(text=temp['layout']['title'], y=1, yanchor='top',
+                   pad=dict(t=0)
+                   )
     )
 
     # SEIR visualisation
