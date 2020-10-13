@@ -27,8 +27,7 @@ title_font = dict(
 URL_epistat = "https://epistat.sciensano.be/Data/"
 
 df_sex = pd.read_csv(URL_epistat + 'COVID19BE_CASES_AGESEX.csv', sep=',', encoding='latin-1')
-# df_muni = pd.read_csv('https://epistat.sciensano.be/Data/COVID19BE_CASES_MUNI.csv', sep=',', encoding='latin-1')
-df_muni_cum = pd.read_csv(URL_epistat + 'COVID19BE_CASES_MUNI_CUM.csv', sep=',', encoding='latin-1',
+df_muni_cum = pd.read_csv(URL_epistat + 'COVID19BE_CASES_MUNI_CUM.csv', sep=',', encoding='utf-8',
                           dtype={"NIS5": str})
 df_hosp = pd.read_csv(URL_epistat + 'COVID19BE_HOSP.csv', sep=',', encoding='latin-1')
 df_mort = pd.read_csv(URL_epistat + 'COVID19BE_MORT.csv', sep=',', encoding='latin-1')
@@ -61,17 +60,17 @@ df_muni_cum["CASES"] = pd.to_numeric(df_muni_cum["CASES"])
 # df_muni_cum["Regions"] = np.where(df_muni_cum["TX_DESCR_NL"] == df_muni_cum["TX_DESCR_FR"],
 #                                   df_muni_cum["TX_DESCR_NL"],
 #                                   df_muni_cum["TX_DESCR_NL"] + '#' + df_muni_cum["TX_DESCR_FR"])
-df_muni_cum['ID'] = df_muni_cum['TX_RGN_DESCR_FR'].map({"Région flamande": "BE2",
-                                                        "Région wallonne": "BE3",
-                                                        "Région de Bruxelles-Capitale": "BE4"})
+df_muni_cum['ID'] = df_muni_cum['REGION'].map({"Flanders": "BE2",
+                                               "Wallonia": "BE3",
+                                               "Brussels": "BE4"})
 df_muni_cum["Regions"] = df_muni_cum['ID'] + df_muni_cum['NIS5']
 
 # Read in geojson
 with open("dash_app/assets/municipalities_belgium.geojson") as response:
     municipalities = json.load(response)
 
-df_muni_cum[["NaN", "Provinces1"]] = df_muni_cum["TX_PROV_DESCR_NL"].str.split(" ", expand=True, )
-df_muni_cum["Provinces"] = np.where(df_muni_cum["TX_RGN_DESCR_FR"] == "Région de Bruxelles-Capitale", "Brussel",
+df_muni_cum["Provinces1"] = df_muni_cum["PROVINCE"]
+df_muni_cum["Provinces"] = np.where(df_muni_cum["REGION"] == "Brussels", "Brussel",
                                     df_muni_cum["Provinces1"])
 
 df_muni_agg = df_muni_cum["CASES"].groupby(df_muni_cum["Provinces"]).sum().reset_index()
@@ -198,7 +197,7 @@ fig_line_deaths.update_layout(
 )
 
 # Create bar chart (tests)
-fig_bar_tests = px.bar(df_tests, x='DATE', y='TESTS')
+fig_bar_tests = px.bar(df_tests, x='DATE', y='TESTS_ALL')
 fig_bar_tests.update_traces(marker_color=colours_list[5])
 
 # Add title to the plot

@@ -10,7 +10,7 @@ class Parameters:
         self.die_percentage = 0.042
         self.cases_hospital_percentage_old = 0.49
         self.total_population = 11400000
-        self.icu_capacity = 0
+        self.icu_capacity = 2200
         self.ventilator_capacity = 0
         self.avg_delay_infection = 12
         self.avg_contagious_period = 4

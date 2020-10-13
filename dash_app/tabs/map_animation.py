@@ -29,9 +29,9 @@ df_muni = df_muni[df_muni['DATE'].notna()]
 df_muni.replace('<5', 3, inplace=True)
 df_muni["CASES"] = pd.to_numeric(df_muni["CASES"])
 ## Add additional ID info per region (to later match with geojson)
-df_muni['ID'] = df_muni['TX_RGN_DESCR_FR'].map({"Région flamande": "BE2",
-                                                "Région wallonne": "BE3",
-                                                "Région de Bruxelles-Capitale": "BE4"})
+df_muni['ID'] = df_muni['REGION'].map({"Flanders": "BE2",
+                                       "Wallonia": "BE3",
+                                       "Brussels": "BE4"})
 
 df_muni["Regions"] = df_muni['ID'] + df_muni['NIS5']
 
@@ -83,8 +83,8 @@ map_anim_muni.update_layout(
 )
 
 ## Provinces view
-df_muni[["NaN", "Provinces1"]] = df_muni["TX_PROV_DESCR_NL"].str.split(" ", expand=True, )
-df_muni["Provinces"] = np.where(df_muni["TX_RGN_DESCR_FR"] == "Région de Bruxelles-Capitale", "Brussel",
+df_muni["Provinces1"] = df_muni["PROVINCE"]
+df_muni["Provinces"] = np.where(df_muni["REGION"] == "Brussels", "Brussel",
                                 df_muni["Provinces1"])
 
 df_prov = df_muni["CASES"].groupby([df_muni["Provinces"], df_muni['DATE']]).sum().reset_index()
@@ -134,7 +134,7 @@ tab_layout = html.Div(
                 html.H2("Province View"),
                 dcc.Graph(figure=map_anim_prov)
             ],
-            width=12)
+                width=12)
         )
     ]
 )
