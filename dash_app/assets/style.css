@@ -145,6 +145,16 @@ h5{
 	color: #FFFFFF;
 }
 
+/* h2 */
+h2{
+	font-family: Roboto;
+	font-style: normal;
+	font-weight: normal;
+	
+	margin-top: 10px;
+    margin-left: 50px;
+}
+
 /* horizontal line */
 hr{
 	border: 1px solid #666666;
