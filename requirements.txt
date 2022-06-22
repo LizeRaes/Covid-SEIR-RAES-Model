@@ -1,5 +1,5 @@
 dash==1.11.0
-numpy==1.18.1
+numpy==1.22.0
 requests==2.23.0
 pandas==0.25.3
 xlrd==1.2.0
